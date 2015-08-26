@@ -1,23 +1,41 @@
 LD=clang
 CXX=clang++
 
+LIBNAME=hugopeixoto-memorel
+REQUIRED_LIBS=-lpq
+INCLUDE_PATH=src/
+
+SRC=
+
+TEST_NAME=test
+TEST_SRC=main.cc
+
+
 CXXFLAGS += -Wall -pedantic -Werror -std=c++14 -stdlib=libc++
 LDFLAGS += -lc++
 
-CXXFLAGS += -Isrc/
-LDFLAGS += -lcurl -lpq
+CXXFLAGS += -I$(INCLUDE_PATH)
+LDFLAGS += $(REQUIRED_LIBS)
 
-SRC=
-LIB=libhugopeixoto-memorel.a
 
+LIB=lib$(LIBNAME).a
 OBJ=$(SRC:.cc=.o)
-all: test $(LIB)
+TEST_OBJ=$(TEST_SRC:.cc=.o)
+CURPATH=$(dir $(abspath $(lastword $(MAKEFILE_LIST))))
+
+all: $(TEST_NAME) $(LIB)
 
 $(LIB): $(OBJ)
 	$(AR) rcs $@ $^
 
-test: main.o $(LIB)
+$(TEST_NAME): $(TEST_OBJ) $(LIB)
 	$(LD) -o $@ $^ $(LDFLAGS)
 
+ldflags:
+	@echo -L"$(CURPATH)" -l$(LIBNAME) $(REQUIRED_LIBS)
+
+cxxflags:
+	@echo -I"$(CURPATH)$(INCLUDE_PATH)"
+
 clean:
-	rm -rf test main.o $(OBJ) $(LIB)
+	rm -rf $(TEST_NAME) $(TEST_OBJ) $(OBJ) $(LIB)
