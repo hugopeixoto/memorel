@@ -95,14 +95,14 @@ template <> bool Fetch(const char *value, bool &field) {
   return true;
 }
 
-template <typename T> bool Fetch(const char *value, Nullable<T> &field) {
+template <typename T> bool Fetch(const char *value, Optional<T> &field) {
   if (value == nullptr) {
-    field.nullify();
+    field = Optional<T>();
     return true;
   } else {
     T tmp;
     bool ok = Fetch(value, tmp);
-    field.set(tmp);
+    field = Optional<T>(tmp);
 
     return ok;
   }

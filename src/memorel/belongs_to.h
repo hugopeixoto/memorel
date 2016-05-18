@@ -11,18 +11,20 @@ class BelongsTo {
 public:
   typedef ForeignKey RelationType;
 
-  BelongsTo() {}
+  void Load(const Table<Target> &targets) {
+    index.Load(targets);
+  }
 
-  BelongsTo(const Table<Target> &targets) { Load(targets); }
+  auto get(const Source &source) const {
+    return index(ForeignKey::key(source)).foldl(
+        Optional<Target>(),
+        [](auto acc, auto e) {
+          return acc.orElse(Optional<Target>(e));
+        });
+  }
 
-  void Load(const Table<Target> &targets) { index.Load(targets); }
-
-  const Target *get(const Source &source) const {
-    const Target *target = nullptr;
-
-    index(ForeignKey::key(source)).each([&target](auto t) { target = t; });
-
-    return target;
+  auto operator()(const Source& source) const {
+    return get(source);
   }
 
 protected:

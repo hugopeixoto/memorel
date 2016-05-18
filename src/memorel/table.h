@@ -11,7 +11,7 @@
 namespace memorel {
 template <typename Resource, typename PrimaryKey = KeyAssociation<
                                  Resource, uint64_t, &Resource::id>>
-class Table : public Enumerable<const Resource *, Collection> {
+class Table : public Enumerable<Resource, Collection> {
 public:
   template <typename A, typename R> struct It {
     It(A it) : it_(it) {}
@@ -51,9 +51,9 @@ public:
   }
 
   virtual void
-  each(std::function<void(const Resource *const &)> pred) const override {
+  each(std::function<void(const Resource&)> pred) const override {
     for (auto e : elements) {
-      pred(&e);
+      pred(e);
     }
   }
 

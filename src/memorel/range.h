@@ -12,15 +12,15 @@ struct Bounds {
 };
 
 template<typename Model>
-class Range : public Enumerable<const Model*, Collection> {
+class Range : public Enumerable<Model, Collection> {
   public:
     typedef std::vector<const Model*> Records;
 
     Range(Bounds b, const Records& r) : bounds(b), records(r) { }
 
-    virtual void each (std::function<void(const Model* const&)> callback) const override {
+    virtual void each (std::function<void(const Model&)> callback) const override {
       for (auto i = bounds.begin; i < bounds.end; i++) {
-        callback(records[i]);
+        callback(*records[i]);
       }
     }
 

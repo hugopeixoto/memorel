@@ -10,7 +10,7 @@ Example usage:
 create table companies(id serial primary key, name varchar);
 create table users(id serial primary key, name varchar, company_id integer);
 insert into companies (name) VALUES ('ndrive'), ('github'), ('google');
-insert into users (name, company_id) VALUES ('hugo', 1), ('john', 2), ('jane', 3), ('kate', 2);
+insert into users (name, company_id) VALUES ('hugo', 1), ('john', 2), ('jane', 3), ('kate', 2), ('khan', NULL);
 ```
 
 ```c++
@@ -26,7 +26,7 @@ insert into users (name, company_id) VALUES ('hugo', 1), ('john', 2), ('jane', 3
 struct User {
   uint64_t id;
   std::string name;
-  Nullable<uint64_t> company_id;
+  Optional<uint64_t> company_id;
 };
 
 struct Company {
@@ -68,23 +68,22 @@ int main() {
   users.company.Load(companies);
   companies.users.Load(users);
 
-  std::cout << "users: " << users.map([](auto u) { return u->name; })
-            << std::endl;
+  auto name = [](auto m) { return m.name; };
 
-  std::cout << "companies: " << companies.map([](auto c) { return c->name; })
-            << std::endl;
+  std::cout << "users: " << users.map(name) << std::endl;
+  std::cout << "companies: " << companies.map(name) << std::endl;
 
-  std::cout << "users' company: "
-            << users.map([&](auto u) {
-                 return std::make_pair(u->name, users.company.get(*u)->name);
-               }) << std::endl;
+  for (auto u : users) {
+    std::cout << u.name << " works for "
+              << users.company(u).map(name).orDefault("no one")
+              << std::endl;
+  }
 
-  std::cout << "companies' users: "
-            << companies.map([&](auto c) {
-                 return std::make_pair(
-                     c->name, companies.users.fetch(*c)
-                                  .map([](auto u) { return u->name; }));
-               }) << std::endl;
+  for (auto c : companies) {
+    std::cout << c.name << " employs "
+              << companies.users.get(c).map(name)
+              << std::endl;
+  }
 
   return 0;
 }
@@ -93,8 +92,14 @@ int main() {
 Output:
 
 ```
-users: (hugo, john, jane, kate)
+users: (hugo, john, jane, kate, khan)
 companies: (ndrive, github, google)
-users' company: ((hugo, ndrive), (john, github), (jane, google), (kate, github))
-companies' users: ((ndrive, (hugo)), (github, (john, kate)), (google, (jane)))
+hugo works for ndrive
+john works for github
+jane works for google
+kate works for github
+khan works for no one
+ndrive employs (hugo)
+github employs (john, kate)
+google employs (jane)
 ```

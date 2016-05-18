@@ -21,7 +21,7 @@ public:
     for (const auto &record : records) {
       auto key = Key::key(record);
 
-      if (!is_null(key)) {
+      if (!is_none(key)) {
         std::get<0>(mapped_values[i]) = key;
         std::get<1>(mapped_values[i]) = &record;
 
@@ -47,9 +47,11 @@ public:
     }
   }
 
-  // memorel::Range<Model> operator() (const Nullable<KeyType>& key) const {
-  //  return memorel::Range<Model>();
-  //}
+  memorel::Range<Model> operator() (const Optional<KeyType>& key) const {
+    return memorel::Range<Model>(
+        key.map([&](auto v) { return index_for(v); }).orDefault(Bounds()),
+        records_);
+  }
 
   memorel::Range<Model> operator()(const KeyType &key) const {
     return memorel::Range<Model>(index_for(key), records_);

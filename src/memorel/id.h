@@ -1,7 +1,7 @@
 #ifndef MEMOREL_ID_H_
 #define MEMOREL_ID_H_
 
-#include "hugopeixoto/nullable.h"
+#include "hugopeixoto/optional.h"
 
 namespace memorel {
 template <typename Resource, typename T, T Resource::*internal_member>
@@ -12,10 +12,10 @@ public:
   static const KeyType key(const Resource &r) { return r.*internal_member; }
 };
 
-template <typename Resource, typename T, Nullable<T> Resource::*internal_member>
-class NullableKeyAssociation {
+template <typename Resource, typename T, Optional<T> Resource::*internal_member>
+class OptionalKeyAssociation {
 public:
-  typedef Nullable<T> KeyType;
+  typedef Optional<T> KeyType;
 
   static const KeyType key(const Resource &r) { return (r.*internal_member); }
 };

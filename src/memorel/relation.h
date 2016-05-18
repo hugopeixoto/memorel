@@ -15,19 +15,19 @@ public:
   using HasMany = ::memorel::HasMany<Model, KeyAssociation<Model, KeyType, &Model::id>,
                             Target, KeyAssociation<Target, KeyType, member>>;
 
-  template <typename Target, Nullable<KeyType> Target::*member>
+  template <typename Target, Optional<KeyType> Target::*member>
   using OptionalHasMany =
       ::memorel::HasMany<Model, KeyAssociation<Model, KeyType, &Model::id>, Target,
-                NullableKeyAssociation<Target, KeyType, member>>;
+                OptionalKeyAssociation<Target, KeyType, member>>;
 
   template <typename Target, KeyType Model::*member>
   using BelongsTo =
       ::memorel::BelongsTo<Model, KeyAssociation<Model, KeyType, member>, Target,
                   KeyAssociation<Target, KeyType, &Target::id>>;
 
-  template <typename Target, Nullable<KeyType> Model::*member>
+  template <typename Target, Optional<KeyType> Model::*member>
   using OptionalBelongsTo =
-      ::memorel::BelongsTo<Model, NullableKeyAssociation<Model, KeyType, member>, Target,
+      ::memorel::BelongsTo<Model, OptionalKeyAssociation<Model, KeyType, member>, Target,
                   KeyAssociation<Target, KeyType, &Target::id>>;
 
   template <typename T, T Model::*member>

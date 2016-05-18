@@ -10,7 +10,7 @@
 struct User {
   uint64_t id;
   std::string name;
-  Nullable<uint64_t> company_id;
+  Optional<uint64_t> company_id;
 };
 
 struct Company {
@@ -52,23 +52,22 @@ int main() {
   users.company.Load(companies);
   companies.users.Load(users);
 
-  std::cout << "users: " << users.map([](auto u) { return u->name; })
-            << std::endl;
+  auto name = [](auto m) { return m.name; };
 
-  std::cout << "companies: " << companies.map([](auto c) { return c->name; })
-            << std::endl;
+  std::cout << "users: " << users.map(name) << std::endl;
+  std::cout << "companies: " << companies.map(name) << std::endl;
 
-  std::cout << "users' company: "
-            << users.map([&](auto u) {
-                 return std::make_pair(u->name, users.company.get(*u)->name);
-               }) << std::endl;
+  for (auto u : users) {
+    std::cout << u.name << " works for "
+              << users.company(u).map(name).orDefault("no one")
+              << std::endl;
+  }
 
-  std::cout << "companies' users: "
-            << companies.map([&](auto c) {
-                 return std::make_pair(
-                     c->name, companies.users.fetch(*c)
-                                  .map([](auto u) { return u->name; }));
-               }) << std::endl;
+  for (auto c : companies) {
+    std::cout << c.name << " employs "
+              << companies.users.get(c).map(name)
+              << std::endl;
+  }
 
   return 0;
 }

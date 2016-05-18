@@ -18,13 +18,8 @@ class HasMany {
 public:
   typedef typename ForeignKey::KeyType KeyType;
 
-  HasMany() {}
-  HasMany(const Table<Target> &targets) { Load(targets); }
-
-  void Load(const Table<Target> &targets) { index.Load(targets); }
-
-  memorel::Range<Target> operator()(const Source &source) const {
-    return index(KeyType(PrimaryKey::key(source)));
+  void Load(const Table<Target> &targets) {
+    index.Load(targets);
   }
 
   template <template <typename> class Container>
@@ -65,7 +60,13 @@ public:
     return targets;
   }
 
-  auto fetch(const Source &source) const { return this->operator()(source); }
+  auto operator()(const Source &source) const {
+    return get(source);
+  }
+
+  auto get(const Source &source) const {
+    return index(KeyType(PrimaryKey::key(source)));
+  }
 
 protected:
   Index<Target, ForeignKey> index;
