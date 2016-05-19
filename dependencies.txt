@@ -1,2 +1,2 @@
-hugopeixoto-optional https://github.com/hugopeixoto/optional.git
-hugopeixoto-enumerable https://github.com/hugopeixoto/enumerable.git
+https://github.com/hugopeixoto/optional.git
+https://github.com/hugopeixoto/enumerable.git
