@@ -52,20 +52,18 @@ int main() {
   users.company.Load(companies);
   companies.users.Load(users);
 
-  auto name = [](auto m) { return m.name; };
-
-  std::cout << "users: " << users.map(name) << std::endl;
-  std::cout << "companies: " << companies.map(name) << std::endl;
+  std::cout << "users: " << users.map(&User::name) << std::endl;
+  std::cout << "companies: " << companies.map(&Company::name) << std::endl;
 
   for (auto u : users) {
     std::cout << u.name << " works for "
-              << users.company(u).map(name).orDefault("no one")
+              << users.company(u).map(&Company::name).orDefault("no one")
               << std::endl;
   }
 
   for (auto c : companies) {
     std::cout << c.name << " employs "
-              << companies.users.get(c).map(name)
+              << companies.users.get(c).map(&User::name)
               << std::endl;
   }
 
